@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -16,10 +17,19 @@ import java.util.List;
 public class SeriesService {
 
     private final SeriesDao seriesDao;
+    private final int seriesLimit;
+    private final int seriesLimitWithSameName;
+    private final int episodeLimit;
 
     @Autowired
-    public SeriesService(SeriesDao seriesDao) {
+    public SeriesService(SeriesDao seriesDao,
+                         @Value("${seriesService.seriesLimit}") int seriesLimit,
+                         @Value("${seriesService.seriesLimitWithSameName}") int seriesLimitWithSameName,
+                         @Value("${seriesService.episodeLimit}") int episodeLimit) {
         this.seriesDao = seriesDao;
+        this.seriesLimit = seriesLimit;
+        this.seriesLimitWithSameName = seriesLimitWithSameName;
+        this.episodeLimit = episodeLimit;
     }
 
     public List<Series> getAllSeries() throws Exception {
@@ -31,14 +41,14 @@ public class SeriesService {
     public void saveSeries(@Valid Series series) throws Exception {
         List<Series> all = this.seriesDao.getAll();
 
-        if (all.size() >= 100) {
+        if (all.size() >= this.seriesLimit) {
             throw new SeriesMaxLimitException();
         }
 
         long countSameName = all.stream()
                 .filter(s -> s.getName().equals(series.getName()))
                 .count();
-        if (countSameName >= 20) {
+        if (countSameName >= this.seriesLimitWithSameName) {
             throw new SeriesNameLimitException(series.getName());
         }
 
@@ -51,7 +61,7 @@ public class SeriesService {
             throw new SeriesSpecialDescriptionException();
         }
 
-        if (series.getEpisodes().size() > 50) {
+        if (series.getEpisodes().size() > this.episodeLimit) {
             throw new SeriesMaxEpisodesException();
         }
 
@@ -68,7 +78,7 @@ public class SeriesService {
         long countSameName = all.stream()
                 .filter(s -> !s.equals(series) && s.getName().equals(series.getName()))
                 .count();
-        if (countSameName >= 20) {
+        if (countSameName >= this.seriesLimitWithSameName) {
             throw new SeriesNameLimitException(series.getName());
         }
 
