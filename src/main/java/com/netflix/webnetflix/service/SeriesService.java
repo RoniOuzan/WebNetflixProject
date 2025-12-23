@@ -2,7 +2,7 @@ package com.netflix.webnetflix.service;
 
 import com.netflix.webnetflix.dal.SeriesDao;
 import com.netflix.webnetflix.entity.Series;
-import com.netflix.webnetflix.service.exception.SeriesException;
+import com.netflix.webnetflix.service.exception.*;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,31 +30,27 @@ public class SeriesService {
         List<Series> all = this.seriesDao.getAll();
 
         if (all.size() >= 100) {
-            throw new SeriesException("Cannot save more than 100 series");
+            throw new SeriesMaxLimitException();
         }
 
-        // max 20 series with same name
         long countSameName = all.stream()
                 .filter(s -> s.getName().equals(series.getName()))
                 .count();
         if (countSameName >= 20) {
-            throw new SeriesException("Cannot add new series with name: " + series.getName());
+            throw new SeriesNameLimitException(series.getName());
         }
 
-        // no duplicate ID
         if (all.stream().anyMatch(s -> s.getId() == series.getId())) {
-            throw new SeriesException("Series with ID " + series.getId() + " already exists");
+            throw new SeriesDuplicateIdException(series.getId());
         }
 
-        // Description cannot be empty if name is "Special"
-        if ("Special".equalsIgnoreCase(series.getName()) && 
-            (series.getDescription() == null || series.getDescription().isBlank())) {
-            throw new SeriesException("Special series must have a description");
+        if ("Special".equalsIgnoreCase(series.getName()) &&
+                (series.getDescription() == null || series.getDescription().isBlank())) {
+            throw new SeriesSpecialDescriptionException();
         }
 
-        // Max 50 episodes
         if (series.getEpisodes().size() > 50) {
-            throw new SeriesException("Series cannot have more than 50 episodes");
+            throw new SeriesMaxEpisodesException();
         }
 
         this.seriesDao.save(series);
@@ -63,17 +59,15 @@ public class SeriesService {
     public void updateSeries(@Valid Series series) throws Exception {
         Series existing = this.seriesDao.get(series.getId());
         if (existing == null) {
-            throw new SeriesException("Cannot update series with ID " + series.getId() + ". It is not found");
+            throw new SeriesNotFoundException(series.getId());
         }
 
         List<Series> all = this.seriesDao.getAll();
-
-        // max 20 series with same name excluding self
         long countSameName = all.stream()
                 .filter(s -> !s.equals(series) && s.getName().equals(series.getName()))
                 .count();
         if (countSameName >= 20) {
-            throw new SeriesException("Cannot change series name to " + series.getName());
+            throw new SeriesNameLimitException(series.getName());
         }
 
         this.seriesDao.update(series);
@@ -82,12 +76,16 @@ public class SeriesService {
     public void deleteSeries(int id) throws Exception {
         Series existing = this.seriesDao.get(id);
         if (existing == null) {
-            throw new SeriesException("Series with ID " + id + " was not deleted");
+            throw new SeriesNotFoundException(id);
         }
         this.seriesDao.delete(id);
     }
 
     public Series getSeries(int id) throws Exception {
-        return this.seriesDao.get(id);
+        Series series = this.seriesDao.get(id);
+        if (series == null) {
+            throw new SeriesNotFoundException(id);
+        }
+        return series;
     }
 }
