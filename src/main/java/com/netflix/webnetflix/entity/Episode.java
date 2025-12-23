@@ -2,10 +2,16 @@ package com.netflix.webnetflix.entity;
 
 import lombok.Data;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.Objects;
 
 @Data
-public class Episode implements Comparable<Episode> {
+public class Episode implements Comparable<Episode>, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     private int id;
     private String name;
     private String description;
