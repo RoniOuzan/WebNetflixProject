@@ -3,6 +3,8 @@ package com.netflix.webnetflix.service;
 import com.netflix.webnetflix.dal.SeriesDao;
 import com.netflix.webnetflix.entity.Series;
 import com.netflix.webnetflix.service.exception.*;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -87,5 +89,29 @@ public class SeriesService {
             throw new SeriesNotFoundException(id);
         }
         return series;
+    }
+
+    @PostConstruct
+    public void onStartup() {
+        try {
+            List<Series> allSeries = seriesDao.getAll();
+            System.out.println("=== Application startup ===");
+            System.out.println("Series list on startup:");
+            allSeries.forEach(s -> System.out.println(s.getName()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @PreDestroy
+    public void onShutdown() {
+        try {
+            List<Series> allSeries = seriesDao.getAll();
+            System.out.println("=== Application shutdown ===");
+            System.out.println("Series list on shutdown:");
+            allSeries.forEach(s -> System.out.println(s.getName()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
