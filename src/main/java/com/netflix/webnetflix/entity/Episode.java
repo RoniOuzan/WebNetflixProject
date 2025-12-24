@@ -17,8 +17,7 @@ public class Episode implements Comparable<Episode>, Serializable {
     private String description;
     private int episodeNumber;
 
-    public Episode(int id, int episodeNumber, String name, String description) {
-        this.id = id;
+    public Episode(int episodeNumber, String name, String description) {
         this.episodeNumber = episodeNumber;
         this.name = name;
         this.description = description;

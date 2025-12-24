@@ -1,6 +1,7 @@
 package com.netflix.webnetflix.service;
 
 import com.netflix.webnetflix.dal.SeriesDao;
+import com.netflix.webnetflix.entity.Episode;
 import com.netflix.webnetflix.entity.Series;
 import com.netflix.webnetflix.service.exception.*;
 import jakarta.annotation.PostConstruct;
@@ -31,6 +32,35 @@ public class SeriesService {
         this.seriesLimitWithSameName = seriesLimitWithSameName;
         this.episodeLimit = episodeLimit;
     }
+    private int getNextSeriesId(List<Series> list) {
+        return list.stream()
+                .mapToInt(Series::getId)
+                .max()
+                .orElse(10000) + 1;
+    }
+    private int getNextEpisodeId(List<Series> list)  {
+        int maxId = 10000;
+
+        for (Series s : list) {
+            for (Episode e : s.getEpisodes()) {
+                if (e.getId() > maxId) {
+                    maxId = e.getId();
+                }
+            }
+        }
+
+        return maxId + 1;
+    }
+
+    public void addEpisode(Series series, Episode episode) throws Exception{
+        List<Series> all = seriesDao.getAll();
+        if (series.getEpisodes().size() > this.episodeLimit) {
+            throw new SeriesMaxEpisodesException();
+        }
+        episode.setId(getNextEpisodeId(all));
+        series.addEpisode(episode);
+        this.seriesDao.update(series);
+    }
 
     public List<Series> getAllSeries() throws Exception {
         List<Series> list = this.seriesDao.getAll();
@@ -60,11 +90,7 @@ public class SeriesService {
                 (series.getDescription() == null || series.getDescription().isBlank())) {
             throw new SeriesSpecialDescriptionException();
         }
-
-        if (series.getEpisodes().size() > this.episodeLimit) {
-            throw new SeriesMaxEpisodesException();
-        }
-
+        series.setId(getNextSeriesId(all));
         this.seriesDao.save(series);
     }
 

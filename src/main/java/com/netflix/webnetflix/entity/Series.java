@@ -27,8 +27,7 @@ public class Series implements Comparable<Series>, Serializable {
 
     private List<Episode> episodes;
 
-    public Series(int id, String name, String description) {
-        this.id = id;
+    public Series(String name, String description) {
         this.name = name;
         this.description = description;
         this.episodes = new ArrayList<>();

@@ -1,5 +1,6 @@
 package com.netflix.webnetflix.dal;
 
+import com.netflix.webnetflix.entity.Episode;
 import com.netflix.webnetflix.entity.Series;
 import org.springframework.stereotype.Repository;
 
@@ -18,6 +19,12 @@ public class SeriesFileDao implements SeriesDao {
     public List<Series> getAll() throws Exception {
         return readFromFile();
     }
+
+    @Override
+    public void addEpisode(Series series, Episode episode) throws Exception{
+        save(series);
+    }
+
 
     @Override
     public void save(Series series) throws Exception {

@@ -1,5 +1,6 @@
 package com.netflix.webnetflix.dal;
 
+import com.netflix.webnetflix.entity.Episode;
 import com.netflix.webnetflix.entity.Series;
 import jdk.jshell.spi.ExecutionControlProvider;
 
@@ -11,4 +12,5 @@ public interface SeriesDao {
     void update(Series series) throws Exception;
     void delete(int id) throws Exception;
     Series get(int id) throws Exception;
+    void addEpisode(Series series, Episode episode) throws Exception;
 }
