@@ -5,7 +5,6 @@ import com.netflix.webnetflix.dal.EpisodeDao;
 import com.netflix.webnetflix.entity.Episode;
 import com.netflix.webnetflix.service.exception.EpisodeNotFoundException;
 import com.netflix.webnetflix.service.exception.SeriesMaxEpisodesException;
-import com.netflix.webnetflix.service.exception.SeriesNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
