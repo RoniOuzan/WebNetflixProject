@@ -21,9 +21,13 @@ public class EpisodeFileDao implements EpisodeDao {
     public void save(Episode episode) throws Exception{
         List<Episode> episodesList = readFromFile();
 
-        if (!episodesList.contains(episode)) {
-            episodesList.add(episode);
-        }
+        episode.setId(
+                episodesList.stream()
+                        .mapToInt(Episode::getId)
+                        .max()
+                        .orElse(20000) + 1
+        );
+        episodesList.add(episode);
 
         writeToFile(episodesList);
     }

@@ -56,6 +56,14 @@ public class EpisodeService {
         this.episodeDao.delete(id);
     }
 
+    public List<Episode> getEpisodesOfList(int id) throws Exception{
+        List<Episode> all = this.episodeDao.getAll();
+
+        List<Episode> episodesInSeries = all.stream().filter(e->e.getSeriesId() == id).toList();
+
+        return episodesInSeries;
+    }
+
     public Episode getEpisode(int id) throws Exception {
         Episode episode = this.episodeDao.get(id);
         if (episode == null) {
@@ -64,7 +72,7 @@ public class EpisodeService {
         return episode;
     }
 
-    public boolean exists(int id) throws Exception{
+    private boolean exists(int id) throws Exception{
         Episode exiting = this.episodeDao.get(id);
 
         return exiting != null;
