@@ -16,12 +16,13 @@ public class Episode implements Comparable<Episode>, Serializable {
     private String name;
     private String description;
     private int episodeNumber;
+    private int seriesId;
 
-    public Episode(int id, int episodeNumber, String name, String description) {
-        this.id = id;
+    public Episode(int episodeNumber, String name, String description, int seriesId) {
         this.episodeNumber = episodeNumber;
         this.name = name;
         this.description = description;
+        this.seriesId = seriesId;
     }
 
     @Override

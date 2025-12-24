@@ -25,17 +25,9 @@ public class Series implements Comparable<Series>, Serializable {
     @Size(max = 200, message = "Description must be at most 200 characters")
     private String description;
 
-    private List<Episode> episodes;
-
-    public Series(int id, String name, String description) {
-        this.id = id;
+    public Series(String name, String description) {
         this.name = name;
         this.description = description;
-        this.episodes = new ArrayList<>();
-    }
-
-    public void addEpisode(Episode episode) {
-        this.episodes.add(episode);
     }
 
     @Override
@@ -53,6 +45,6 @@ public class Series implements Comparable<Series>, Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.id, this.name, this.description, this.episodes);
+        return Objects.hash(this.id, this.name, this.description);
     }
 }
