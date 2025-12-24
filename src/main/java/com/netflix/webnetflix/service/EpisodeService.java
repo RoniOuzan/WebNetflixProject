@@ -40,6 +40,7 @@ public class EpisodeService {
         if (episodesInSeries.size() > this.episodeLimit) {
             throw new SeriesMaxEpisodesException();
         }
+        this.episodeDao.save(episode);
     }
 
     public void updateEpisode(@Valid Episode episode) throws Exception {

@@ -92,10 +92,7 @@ public class CLI {
         if (episodes.isEmpty()) {
             System.out.println("No episodes");
         } else {
-            episodes.forEach(e ->
-                    System.out.println("Episode " + e.getEpisodeNumber() +
-                            ": " + e.getName())
-            );
+            episodes.forEach(System.out::println);
         }
     }
 
