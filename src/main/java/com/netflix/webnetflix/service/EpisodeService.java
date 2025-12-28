@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -60,8 +61,9 @@ public class EpisodeService {
     public List<Episode> getEpisodesOfList(int id) throws Exception{
         List<Episode> all = this.episodeDao.getAll();
 
-        List<Episode> episodesInSeries = all.stream().filter(e->e.getSeriesId() == id).toList();
+        List<Episode> episodesInSeries = new ArrayList<>(all.stream().filter(e->e.getSeriesId() == id).toList());
 
+        Collections.sort(episodesInSeries);
         return episodesInSeries;
     }
 

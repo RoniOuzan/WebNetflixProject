@@ -31,9 +31,10 @@ public class CLI {
 
         while (running) {
             printMenu();
-            int choice = readInt("Choose option: ");
+
 
             try {
+                int choice = readInt("Choose option: ");
                 switch (choice) {
                     case 1 -> showSeriesList();
                     case 2 -> showSingleSeries();
