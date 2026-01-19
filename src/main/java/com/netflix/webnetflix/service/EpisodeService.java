@@ -19,12 +19,15 @@ public class EpisodeService {
 
     private final EpisodeDao episodeDao;
     private final int episodeLimit;
+    private final ValidationService validationService;
 
     @Autowired
     public EpisodeService(EpisodeDao episodeDao,
-                          @Value("${seriesService.episodeLimit}") int episodeLimit) {
+                          @Value("${seriesService.episodeLimit}") int episodeLimit,
+                          ValidationService validationService) {
         this.episodeDao = episodeDao;
         this.episodeLimit = episodeLimit;
+        this.validationService = validationService;
     }
 
     public List<Episode> getAllEpisode() throws Exception {
@@ -41,6 +44,7 @@ public class EpisodeService {
         if (episodesInSeries.size() > this.episodeLimit) {
             throw new SeriesMaxEpisodesException();
         }
+        validationService.validate(episode);
         this.episodeDao.save(episode);
     }
 
@@ -48,6 +52,7 @@ public class EpisodeService {
         if(!exists(episode.getId())){
             throw new EpisodeNotFoundException(episode.getId());
         }
+        validationService.validate(episode);
         this.episodeDao.update(episode);
     }
 
