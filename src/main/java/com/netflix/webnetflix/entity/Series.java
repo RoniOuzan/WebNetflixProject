@@ -25,9 +25,20 @@ public class Series implements Comparable<Series>, Serializable {
     @Size(max = 200, message = "Description must be at most 200 characters")
     private String description;
 
-    public Series(String name, String description) {
+    private List<Episode> episodes;
+
+    public Series(String name, String description, List<Episode> episodes) {
         this.name = name;
         this.description = description;
+        this.episodes = episodes;
+    }
+
+    public Series(String name, String description) {
+        this(name, description, new ArrayList<>());
+    }
+
+    public void addEpisode(Episode episode) {
+        this.episodes.add(episode);
     }
 
     @Override

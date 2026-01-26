@@ -25,13 +25,11 @@ public class Episode implements Comparable<Episode>, Serializable {
 
     @Min(value = 1, message = "Episode number must be >= 1")
     private int episodeNumber;
-    private int seriesId;
 
-    public Episode(int episodeNumber, String name, String description, int seriesId) {
+    public Episode(int episodeNumber, String name, String description) {
         this.episodeNumber = episodeNumber;
         this.name = name;
         this.description = description;
-        this.seriesId = seriesId;
     }
 
     @Override

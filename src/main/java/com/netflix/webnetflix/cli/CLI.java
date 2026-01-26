@@ -2,7 +2,6 @@ package com.netflix.webnetflix.cli;
 
 import com.netflix.webnetflix.entity.Episode;
 import com.netflix.webnetflix.entity.Series;
-import com.netflix.webnetflix.service.EpisodeService;
 import com.netflix.webnetflix.service.SeriesService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -17,12 +16,12 @@ public class CLI {
 
     static Scanner scanner;
     static SeriesService seriesService;
-    static EpisodeService episodeService;
+//    static EpisodeService episodeService;
 
     public static void main(String[] args) {
         var context = SpringApplication.run(CLI.class, args);
         seriesService = context.getBean("seriesService", SeriesService.class);
-        episodeService = context.getBean("episodeService", EpisodeService.class);
+//        episodeService = context.getBean("episodeService", EpisodeService.class);
         scanner = new Scanner(System.in);
         run();
     }
@@ -88,8 +87,7 @@ public class CLI {
         System.out.println("Name: " + s.getName());
         System.out.println("Description: " + s.getDescription());
 
-        List<Episode> episodes = episodeService.getEpisodesOfList(s.getId());
-
+        List<Episode> episodes = s.getEpisodes();
         if (episodes.isEmpty()) {
             System.out.println("No episodes");
         } else {
@@ -136,40 +134,48 @@ public class CLI {
         String name = readString("Episode name: ");
         String desc = readString("Episode description: ");
 
-        episodeService.saveEpisode(new Episode(epNum, name, desc, series.getId()));
+        Episode episode = new Episode(epNum, name, desc);
+//        episodeService.saveEpisode(episode);
+
+        // TOOD: check this
+        series.addEpisode(episode);
+        seriesService.updateSeries(series);
 
         System.out.println("Episode added");
     }
 
     private static void deleteEpisode() throws Exception {
         int epId = readInt("Episode id: ");
-        Episode episode = episodeService.getEpisode(epId);
+        // TODO
+//        Episode episode = episodeService.getEpisode(epId);
 
-        episodeService.deleteEpisode(episode.getId());
+//        episodeService.deleteEpisode(episode.getId());
         System.out.println("Episode deleted");
     }
 
     private static void updateEpisode() throws Exception{
         int id = readInt("episode id: ");
-        Episode existing = episodeService.getEpisode(id);
+        // TODO
+//        Episode existing = episodeService.getEpisode(id);
 
-        int epNum = readInt("New episode number: ");
-        String name = readString("New name: ");
-        String desc = readString("New description: ");
-
-        existing.setEpisodeNumber(epNum);
-        existing.setName(name);
-        existing.setDescription(desc);
-
-        episodeService.updateEpisode(existing);
+//        int epNum = readInt("New episode number: ");
+//        String name = readString("New name: ");
+//        String desc = readString("New description: ");
+//
+//        existing.setEpisodeNumber(epNum);
+//        existing.setName(name);
+//        existing.setDescription(desc);
+//
+//        episodeService.updateEpisode(existing);
         System.out.println("Series updated");
     }
 
     private static void showSingleEpisode() throws Exception{
         int id = readInt("Episode id: ");
-        Episode e = episodeService.getEpisode(id);
+        // TODO
+//        Episode e = episodeService.getEpisode(id);
 
-        System.out.println(e);
+//        System.out.println(e);
     }
 
 
