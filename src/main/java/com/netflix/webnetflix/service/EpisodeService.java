@@ -19,12 +19,15 @@ public class EpisodeService {
 
     private final EpisodeDao episodeDao;
     private final int episodeLimit;
+    private final ValidationService validationService;
 
     @Autowired
     public EpisodeService(EpisodeDao episodeDao,
-                          @Value("${seriesService.episodeLimit}") int episodeLimit) {
+                          @Value("${seriesService.episodeLimit}") int episodeLimit,
+                          ValidationService validationService) {
         this.episodeDao = episodeDao;
         this.episodeLimit = episodeLimit;
+        this.validationService = validationService;
     }
 
     public List<Episode> getAllEpisode() throws Exception {
@@ -33,14 +36,25 @@ public class EpisodeService {
         return list;
     }
 
-    public void saveEpisode(@Valid Episode episode) throws Exception{
+    public void saveEpisode(@Valid Episode episode) throws Exception {
         List<Episode> all = this.episodeDao.getAll();
+        List<Episode> episodesInSeries = all.stream().filter(e -> e.getSeriesId() == episode.getSeriesId()).toList();
 
-        List<Episode> episodesInSeries = all.stream().filter(e->e.getSeriesId() == episode.getSeriesId()).toList();
+        // Check for duplicates
+        for (Episode existing : episodesInSeries) {
+            if (existing.getEpisodeNumber() == episode.getEpisodeNumber()) {
+                throw new Exception("An episode with number " + episode.getEpisodeNumber() + " already exists in this series.");
+            }
+            if (existing.getName().equalsIgnoreCase(episode.getName())) {
+                throw new Exception("An episode with the name '" + episode.getName() + "' already exists.");
+            }
+        }
 
-        if (episodesInSeries.size() > this.episodeLimit) {
+        if (episodesInSeries.size() >= this.episodeLimit) {
             throw new SeriesMaxEpisodesException();
         }
+
+        validationService.validate(episode);
         this.episodeDao.save(episode);
     }
 
@@ -48,6 +62,24 @@ public class EpisodeService {
         if(!exists(episode.getId())){
             throw new EpisodeNotFoundException(episode.getId());
         }
+
+        List<Episode> all = this.episodeDao.getAll();
+        // Get all episodes in this series EXCEPT the one we are currently editing
+        List<Episode> otherEpisodesInSeries = all.stream()
+                .filter(e -> e.getSeriesId() == episode.getSeriesId() && e.getId() != episode.getId())
+                .toList();
+
+        // Check for duplicates against other episodes
+        for (Episode existing : otherEpisodesInSeries) {
+            if (existing.getEpisodeNumber() == episode.getEpisodeNumber()) {
+                throw new Exception("An episode with number " + episode.getEpisodeNumber() + " already exists in this series.");
+            }
+            if (existing.getName().equalsIgnoreCase(episode.getName())) {
+                throw new Exception("An episode with the name '" + episode.getName() + "' already exists.");
+            }
+        }
+
+        validationService.validate(episode);
         this.episodeDao.update(episode);
     }
 
