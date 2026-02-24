@@ -77,7 +77,7 @@ public class SeriesController {
     public String saveSeries(@Valid @ModelAttribute("series") Series series,
                              BindingResult result,
                              @RequestParam String mode,
-                             Model model) throws Exception {
+                             Model model) {
         if (result.hasErrors()) {
             model.addAttribute("mode", mode);
             return "series-form";

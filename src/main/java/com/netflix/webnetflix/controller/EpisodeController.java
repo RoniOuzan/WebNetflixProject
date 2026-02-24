@@ -9,6 +9,8 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/episode")
 public class EpisodeController {
@@ -25,9 +27,15 @@ public class EpisodeController {
                                @RequestParam int seriesId,
                                @RequestParam(required = false) Integer selectedEpId,
                                Model model) throws Exception {
-
         if (action.equals("Add")) {
-            model.addAttribute("episode", new Episode(1, "", "", seriesId));
+            List<Episode> existingEpisodes = episodeService.getEpisodesOfList(seriesId);
+            int nextEpNum = 1;
+
+            if (!existingEpisodes.isEmpty()) {
+                nextEpNum = existingEpisodes.get(existingEpisodes.size() - 1).getEpisodeNumber() + 1;
+            }
+
+            model.addAttribute("episode", new Episode(nextEpNum, "", "", seriesId));
             model.addAttribute("mode", "add");
             model.addAttribute("seriesId", seriesId);
             return "episode-form";
@@ -75,7 +83,6 @@ public class EpisodeController {
         }
 
         // Try to save, catch our duplicate error if it fails
-        // Inside EpisodeController.java -> saveEpisode()
         try {
             if (mode.equals("add")) {
                 episodeService.saveEpisode(episode);
