@@ -1,5 +1,8 @@
 package com.netflix.webnetflix.entity;
 
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.io.Serial;
@@ -13,15 +16,22 @@ public class Episode implements Comparable<Episode>, Serializable {
     private static final long serialVersionUID = 1L;
 
     private int id;
+    @NotBlank(message = "Name cannot be blank")
+    @Size(max = 50, message = "Name must be at most 50 characters")
     private String name;
-    private String description;
-    private int episodeNumber;
 
-    public Episode(int id, int episodeNumber, String name, String description) {
-        this.id = id;
+    @Size(max = 200, message = "Description must be at most 200 characters")
+    private String description;
+
+    @Min(value = 1, message = "Episode number must be >= 1")
+    private int episodeNumber;
+    private int seriesId;
+
+    public Episode(int episodeNumber, String name, String description, int seriesId) {
         this.episodeNumber = episodeNumber;
         this.name = name;
         this.description = description;
+        this.seriesId = seriesId;
     }
 
     @Override

@@ -19,17 +19,17 @@ public class SeriesService {
     private final SeriesDao seriesDao;
     private final int seriesLimit;
     private final int seriesLimitWithSameName;
-    private final int episodeLimit;
+    private final ValidationService validationService;
 
     @Autowired
     public SeriesService(SeriesDao seriesDao,
                          @Value("${seriesService.seriesLimit}") int seriesLimit,
                          @Value("${seriesService.seriesLimitWithSameName}") int seriesLimitWithSameName,
-                         @Value("${seriesService.episodeLimit}") int episodeLimit) {
+                         ValidationService validationService) {
         this.seriesDao = seriesDao;
         this.seriesLimit = seriesLimit;
         this.seriesLimitWithSameName = seriesLimitWithSameName;
-        this.episodeLimit = episodeLimit;
+        this.validationService = validationService;
     }
 
     public List<Series> getAllSeries() throws Exception {
@@ -40,6 +40,8 @@ public class SeriesService {
 
     public void saveSeries(@Valid Series series) throws Exception {
         List<Series> all = this.seriesDao.getAll();
+
+        validationService.validate(series);
 
         if (all.size() >= this.seriesLimit) {
             throw new SeriesMaxLimitException();
@@ -61,14 +63,12 @@ public class SeriesService {
             throw new SeriesSpecialDescriptionException();
         }
 
-        if (series.getEpisodes().size() > this.episodeLimit) {
-            throw new SeriesMaxEpisodesException();
-        }
-
         this.seriesDao.save(series);
     }
 
     public void updateSeries(@Valid Series series) throws Exception {
+        validationService.validate(series);
+
         Series existing = this.seriesDao.get(series.getId());
         if (existing == null) {
             throw new SeriesNotFoundException(series.getId());

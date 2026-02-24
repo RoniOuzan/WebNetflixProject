@@ -5,7 +5,6 @@ import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -23,9 +22,15 @@ public class SeriesFileDao implements SeriesDao {
     public void save(Series series) throws Exception {
         List<Series> seriesList = readFromFile();
 
-        if (!seriesList.contains(series)) {
-            seriesList.add(series);
-        }
+
+        series.setId(
+                seriesList.stream()
+                        .mapToInt(Series::getId)
+                        .max()
+                        .orElse(10000) + 1
+        );
+        seriesList.add(series);
+
 
         writeToFile(seriesList);
     }
