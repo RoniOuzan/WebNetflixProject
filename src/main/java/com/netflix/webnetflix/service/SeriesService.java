@@ -41,6 +41,17 @@ public class SeriesService {
     public void saveSeries(Series series) throws Exception {
         List<Series> all = this.seriesDao.getAll();
 
+        if (all.size() >= this.seriesLimit) {
+            throw new SeriesMaxLimitException(this.seriesLimit);
+        }
+
+        long countSameName = all.stream()
+                .filter(s -> s.getName().equals(series.getName()))
+                .count();
+        if (countSameName >= this.seriesLimitWithSameName) {
+            throw new SeriesNameLimitException(series.getName());
+        }
+
         // Check for duplicate Series name
         for (Series existing : all) {
             if (existing.getName().equalsIgnoreCase(series.getName())) {

@@ -75,14 +75,18 @@ public class EpisodeController {
         }
 
         // Try to save, catch our duplicate error if it fails
+        // Inside EpisodeController.java -> saveEpisode()
         try {
             if (mode.equals("add")) {
                 episodeService.saveEpisode(episode);
             } else if (mode.equals("edit")) {
                 episodeService.updateEpisode(episode);
             }
+        } catch (com.netflix.webnetflix.service.exception.SeriesMaxEpisodesException maxEx) {
+            // Let the global handler deal with this one, as requested by the assignment
+            throw maxEx;
         } catch (Exception e) {
-            // If duplicate found, send the error message back to the form
+            // Keep the duplicate error on the form
             model.addAttribute("mode", mode);
             model.addAttribute("seriesId", seriesId);
             model.addAttribute("errorMessage", e.getMessage());
