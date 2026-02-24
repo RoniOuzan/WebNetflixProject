@@ -18,8 +18,14 @@ public class LoginController {
     }
 
     @PostMapping("/login")
-    public String doLogin(@RequestParam String username, HttpSession session) {
-        if (username != null && !username.trim().isEmpty()) {
+    public String doLogin(@RequestParam String username, @RequestParam String password, HttpSession session) throws Exception {
+        if (username != null && !username.trim().isEmpty() &&
+            password != null && !password.trim().isEmpty()) {
+
+            if (!password.equals("123")) {
+                throw new Exception("Password is incorrect");
+            }
+
             session.setAttribute("username", username);
             return "redirect:/series";
         }
