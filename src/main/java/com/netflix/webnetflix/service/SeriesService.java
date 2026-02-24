@@ -38,50 +38,35 @@ public class SeriesService {
         return list;
     }
 
-    public void saveSeries(@Valid Series series) throws Exception {
+    public void saveSeries(Series series) throws Exception {
         List<Series> all = this.seriesDao.getAll();
 
+        // Check for duplicate Series name
+        for (Series existing : all) {
+            if (existing.getName().equalsIgnoreCase(series.getName())) {
+                throw new Exception("A series with the name '" + series.getName() + "' already exists.");
+            }
+        }
+
         validationService.validate(series);
-
-        if (all.size() >= this.seriesLimit) {
-            throw new SeriesMaxLimitException();
-        }
-
-        long countSameName = all.stream()
-                .filter(s -> s.getName().equals(series.getName()))
-                .count();
-        if (countSameName >= this.seriesLimitWithSameName) {
-            throw new SeriesNameLimitException(series.getName());
-        }
-
-        if (all.stream().anyMatch(s -> s.getId() == series.getId())) {
-            throw new SeriesDuplicateIdException(series.getId());
-        }
-
-        if ("Special".equalsIgnoreCase(series.getName()) &&
-                (series.getDescription() == null || series.getDescription().isBlank())) {
-            throw new SeriesSpecialDescriptionException();
-        }
-
         this.seriesDao.save(series);
     }
 
-    public void updateSeries(@Valid Series series) throws Exception {
-        validationService.validate(series);
-
-        Series existing = this.seriesDao.get(series.getId());
-        if (existing == null) {
-            throw new SeriesNotFoundException(series.getId());
+    public void updateSeries(Series series) throws Exception {
+        if (this.seriesDao.get(series.getId()) == null) {
+            throw new Exception("Series not found");
         }
 
         List<Series> all = this.seriesDao.getAll();
-        long countSameName = all.stream()
-                .filter(s -> !s.equals(series) && s.getName().equals(series.getName()))
-                .count();
-        if (countSameName >= this.seriesLimitWithSameName) {
-            throw new SeriesNameLimitException(series.getName());
+
+        // Check for duplicate name against OTHER series
+        for (Series existing : all) {
+            if (existing.getId() != series.getId() && existing.getName().equalsIgnoreCase(series.getName())) {
+                throw new Exception("Another series with the name '" + series.getName() + "' already exists.");
+            }
         }
 
+        validationService.validate(series);
         this.seriesDao.update(series);
     }
 

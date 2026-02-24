@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Series Details</title>
+</head>
+<body class="container mt-4 mb-5">
+
+<h2 th:text="${mode == 'add' ? 'Add Series' : (mode == 'edit' ? 'Edit Series' : 'Show Series')}"></h2>
+
+<form th:action="@{/series/save}" th:object="${series}" method="post" class="mt-4 shadow-sm p-4 bg-light rounded">
+
+    <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+    <input type="hidden" name="mode" th:value="${mode}">
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Series ID:</label>
+        <input type="text" th:field="*{id}" class="form-control" disabled>
+        <input type="hidden" th:field="*{id}">
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Name:</label>
+        <input type="text" th:field="*{name}" class="form-control" th:readonly="${mode == 'show'}">
+        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label fw-bold">Description:</label>
+        <textarea th:field="*{description}" class="form-control" rows="3" th:readonly="${mode == 'show'}"></textarea>
+        <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}" class="text-danger"></span>
+    </div>
+
+    <div class="mb-4 text-center" th:if="${mode == 'show'}">
+        <img th:src="@{'https://placehold.co/600x300/222222/E50914/png?text=' + ${series.name}}"
+             alt="Series Thumbnail"
+             class="img-fluid rounded shadow-sm">
+    </div>
+
+    <div>
+        <button th:if="${mode != 'show'}" type="submit" class="btn btn-primary">Save Series</button>
+        <a th:href="@{/series}" class="btn btn-secondary" th:text="${mode == 'show' ? 'Back to Main Menu' : 'Cancel'}"></a>
+    </div>
+</form>
+
+<div th:if="${mode == 'show'}" class="mt-5">
+    <hr>
+    <h3 class="mb-3">Episodes for this Series</h3>
+
+    <form th:action="@{/episode/action}" method="post" class="shadow-sm p-4 bg-white border rounded">
+        <input type="hidden" name="seriesId" th:value="${series.id}">
+
+        <div class="mb-3 btn-group">
+            <button type="submit" name="action" value="Add" class="btn btn-success">Add Episode</button>
+            <button type="submit" name="action" value="Show" class="btn btn-info text-white">Show Episode</button>
+            <button type="submit" name="action" value="Edit" class="btn btn-primary">Edit Episode</button>
+            <button type="submit" name="action" value="Delete" class="btn btn-danger" onclick="return confirm('Delete this episode?');">Delete Episode</button>
+        </div>
+
+        <table class="table table-striped table-bordered mt-3">
+            <thead class="table-dark">
+            <tr>
+                <th>Select</th>
+                <th>Ep Number</th>
+                <th>Name</th>
+                <th>Description</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="ep : ${episodes}">
+                <td><input type="radio" name="selectedEpId" th:value="${ep.id}"></td>
+                <td th:text="${ep.episodeNumber}"></td>
+                <td th:text="${ep.name}"></td>
+                <td th:text="${ep.description}"></td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(episodes)}">
+                <td colspan="4" class="text-center text-muted py-3">No episodes found for this series. Click "Add Episode" above.</td>
+            </tr>
+            </tbody>
+        </table>
+    </form>
+</div>
+
+</body>
+</html>

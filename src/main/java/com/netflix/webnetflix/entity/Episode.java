@@ -34,6 +34,9 @@ public class Episode implements Comparable<Episode>, Serializable {
         this.seriesId = seriesId;
     }
 
+    public Episode() {
+    }
+
     @Override
     public int compareTo(Episode o) {
         return Integer.compare(this.episodeNumber, o.episodeNumber);
