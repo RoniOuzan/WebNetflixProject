@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class LoginController {
 
+    private static final String PASSWORD = "123";
+
     @GetMapping({"/", "/login"})
     public String showLogin(HttpSession session) {
         if (session.getAttribute("username") != null) {
@@ -22,7 +24,7 @@ public class LoginController {
         if (username != null && !username.trim().isEmpty() &&
             password != null && !password.trim().isEmpty()) {
 
-            if (!password.equals("123")) {
+            if (!password.equals(PASSWORD)) {
                 throw new Exception("Password is incorrect");
             }
 
